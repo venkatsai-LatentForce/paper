@@ -35,15 +35,15 @@ export default function PracticeTicket() {
   };
 
   return (
-    <div className="ticket" aria-label="Practice trade demo">
-      <div className="spread">
-        <span className="eyebrow">Try a practice trade</span>
-        <span className="tag">Simulated prices</span>
-      </div>
+    <section className="ticket" aria-label="Practice trade demo">
+      <header className="ticket-head">
+        <span className="label">Try a practice trade</span>
+        <span className="status status-live"><i aria-hidden="true" />Simulated prices</span>
+      </header>
 
-      <div className="segmented" role="group" aria-label="Stock">
+      <div className="segmented ticket-symbols" role="group" aria-label="Stock">
         {Object.keys(DEMO).map((s) => (
-          <button key={s} type="button" className={symbol === s ? "on" : ""}
+          <button key={s} type="button" className={symbol === s ? "on" : ""} aria-pressed={symbol === s}
             disabled={Boolean(position) && position.symbol !== s} onClick={() => setSymbol(s)}>
             {s}
           </button>
@@ -51,23 +51,26 @@ export default function PracticeTicket() {
       </div>
 
       <div className="ticket-quote">
-        <div>
-          <div className={`ticket-price ${dir}`}>{money(price)}</div>
-          <div className="ticket-meta">NSE · {symbol} · <span className={tone(dayChange)}>{pct(dayChange)}</span></div>
+        <div className={`ticket-price num ${dir}`}>{money(price)}</div>
+        <div className="ticket-meta">
+          <span className="label">NSE · {symbol}</span>
+          <span className={`num ${tone(dayChange)}`}>{pct(dayChange)}</span>
         </div>
       </div>
 
-      <Sparkline points={history[symbol]} entry={position?.price} />
+      <Sparkline points={history[symbol]} entry={position?.price} grid />
 
       <div className="ticket-body">
         {position ? (
           <>
-            <div className="kv"><span className="muted">Bought {position.qty} at</span><span className="num">{money(position.price)}</span></div>
-            <div className="kv">
-              <span className="muted">Open P&amp;L</span>
-              <span className={`num ${tone(livePnl)}`} style={{ fontWeight: 800, fontSize: "var(--fs-lg)" }}>{signedMoney(livePnl)}</span>
-            </div>
-            <button type="button" className="sell btn-block" style={{ marginTop: "var(--s-3)" }} onClick={sell}>
+            <dl className="kvs">
+              <div className="kv"><dt>Bought {position.qty} at</dt><dd className="num">{money(position.price)}</dd></div>
+              <div className="kv kv-strong">
+                <dt>Open P&amp;L</dt>
+                <dd className={`num ${tone(livePnl)}`}>{signedMoney(livePnl)}</dd>
+              </div>
+            </dl>
+            <button type="button" className="sell btn-block btn-lg" onClick={sell}>
               Sell {position.qty} {symbol}
             </button>
           </>
@@ -76,29 +79,29 @@ export default function PracticeTicket() {
             <div className="ticket-trade">
               <div className="stepper">
                 <button type="button" aria-label="Decrease quantity" onClick={() => setQty((q) => Math.max(5, q - 5))}>−</button>
-                <span className="num">{qty} shares</span>
+                <span className="num" aria-live="polite">{qty} shares</span>
                 <button type="button" aria-label="Increase quantity" onClick={() => setQty((q) => Math.min(200, q + 5))}>+</button>
               </div>
-              <button type="button" className="buy" onClick={buy}>Buy {symbol}</button>
+              <button type="button" className="buy btn-lg" onClick={buy}>Buy {symbol}</button>
             </div>
-            <div className="kv" style={{ marginTop: "var(--s-2)" }}>
-              <span className="muted">Order value</span><span className="num">{money(qty * price)}</span>
-            </div>
+            <dl className="kvs">
+              <div className="kv"><dt>Order value</dt><dd className="num">{money(qty * price)}</dd></div>
+            </dl>
           </>
         )}
       </div>
 
       {result && (
-        <div key={realized} className={`ticket-result ${tone(result.pnl)}`}>
-          Sold {result.qty} {result.symbol} for{" "}
-          <strong className={tone(result.pnl)}>{signedMoney(result.pnl)}</strong>. Your account logs every trade like this.
-        </div>
+        <p key={realized} className="ticket-result" role="status">
+          <span className="side side-SELL">Sold</span> {result.qty} {result.symbol} for{" "}
+          <strong className={`num ${tone(result.pnl)}`}>{signedMoney(result.pnl)}</strong>. Your account logs every trade like this.
+        </p>
       )}
 
-      <div className="ticket-foot spread small">
-        <span className="muted">Practice cash</span>
-        <span className="num" style={{ fontWeight: 700, fontSize: "var(--fs-base)" }}>{money(cash)}</span>
-      </div>
-    </div>
+      <footer className="ticket-foot">
+        <span className="label">Practice cash</span>
+        <span className="num">{money(cash)}</span>
+      </footer>
+    </section>
   );
 }

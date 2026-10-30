@@ -5,8 +5,6 @@ import BrandMark from "../components/BrandMark.jsx";
 import { ErrorText } from "../components/ui.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const MAX_START = 1000000;
-
 function useSubmit(action) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -73,11 +71,9 @@ export function Login() {
 
 export function Register() {
   const { register } = useAuth();
-  const [form, setForm] = useState({ name: "", email: "", password: "", starting_balance: "100000" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-  const { submit, error, busy } = useSubmit(() =>
-    register({ ...form, starting_balance: Number(form.starting_balance) })
-  );
+  const { submit, error, busy } = useSubmit(() => register(form));
 
   return (
     <AuthCard title="Create your practice account" lead="Practice money only. No real funds, ever."
@@ -95,10 +91,10 @@ export function Register() {
           <label htmlFor="password">Password (at least 8 characters)</label>
           <input id="password" type="password" autoComplete="new-password" minLength={8} required value={form.password} onChange={set("password")} />
         </div>
-        <div className="field">
-          <label htmlFor="bal">Starting balance in ₹ (up to 10,00,000)</label>
-          <input id="bal" type="number" min="1" max={MAX_START} step="1" required value={form.starting_balance} onChange={set("starting_balance")} />
-        </div>
+        <p className="start-note">
+          You'll start with <span className="num">₹1,00,000</span> in practice money. Add more any time,
+          up to <span className="num">₹10,00,000</span>.
+        </p>
         <ErrorText>{error}</ErrorText>
         <button className="primary btn-block btn-lg btn-arrow" disabled={busy} aria-busy={busy}>
           {busy ? <><span className="spinner" />Creating account…</> : "Create account"}

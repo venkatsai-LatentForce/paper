@@ -15,7 +15,7 @@ function Items({ prices, hidden }) {
           <li key={s}>
             <span className="tape-sym">{s}</span>
             <span className="num">{money(p)}</span>
-            <span className={`num tape-chg ${tone(chg)}`}>{chg >= 0 ? "▲" : "▼"} {pct(chg)}</span>
+            <span className={`num ${tone(chg)}`}>{chg >= 0 ? "▲" : "▼"} {pct(chg)}</span>
           </li>
         );
       })}
@@ -28,7 +28,7 @@ export default function TickerTape() {
   const { prices } = useSimPrices(TAPE, 2200);
   return (
     <div className="tape" aria-label="Sample prices">
-      <span className="tape-label">Sample prices</span>
+      <span className="tape-label">Sample</span>
       <div className="tape-viewport">
         <div className="tape-track">
           <Items prices={prices} />

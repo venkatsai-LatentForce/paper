@@ -10,7 +10,9 @@ export default function Orders() {
   return (
     <div className="stack">
       <PageHead eyebrow="History" title="Orders"
-        aside={data?.length > 0 && <span className="small muted">Realised so far <Pnl value={realized} /></span>}>
+        aside={data?.length > 0 && (
+          <span className="readout"><span className="label">Realised so far</span><Pnl value={realized} /></span>
+        )}>
         Every executed order and what it made or lost. Sells show realised P&amp;L; buys show P&amp;L against today's price.
       </PageHead>
       <ErrorText>{error}</ErrorText>
@@ -23,10 +25,11 @@ export default function Orders() {
       ) : (
         <div className="table-wrap">
           <table>
+            <caption className="sr-only">Executed orders</caption>
             <thead>
               <tr>
-                <th>Instrument</th><th>Time</th><th>Side</th><th>Qty</th>
-                <th>Price</th><th>Value</th><th>P&amp;L</th>
+                <th scope="col">Instrument</th><th scope="col">Time</th><th scope="col">Side</th><th scope="col">Qty</th>
+                <th scope="col">Price</th><th scope="col">Value</th><th scope="col">P&amp;L</th>
               </tr>
             </thead>
             <tbody>
@@ -36,11 +39,11 @@ export default function Orders() {
                     <Link to={`/trade/${o.exchange}/${encodeURIComponent(o.symbol)}`} className="sym">{o.symbol}</Link>{" "}
                     <TypeTag type={o.instrument_type} />
                   </td>
-                  <td className="muted">{dateTime(o.created_at)}</td>
-                  <td className={`side-${o.side}`}>{o.side === "BUY" ? "Buy" : "Sell"}</td>
-                  <td>{o.quantity}</td>
-                  <td>{money(o.price)}</td>
-                  <td>{money(o.value)}</td>
+                  <td className="num muted">{dateTime(o.created_at)}</td>
+                  <td><span className={`side side-${o.side}`}>{o.side === "BUY" ? "Buy" : "Sell"}</span></td>
+                  <td className="num">{o.quantity}</td>
+                  <td className="num">{money(o.price)}</td>
+                  <td className="num">{money(o.value)}</td>
                   <td>
                     <Pnl value={o.pnl} />
                     <div className="sub">{o.pnl_type === "realized" ? "Realised" : "vs current price"}</div>

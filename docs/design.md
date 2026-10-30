@@ -1,86 +1,110 @@
-# Design
+# Design: Terminal
 
-Calm and precise: neutral surfaces, brand colour for actions, colour otherwise reserved for P&L.
+A professional trading desk, calm rather than loud. Dark espresso surfaces, graphite hairlines, sand text and
+**one** accent, tan. Colour otherwise means only one thing: profit (sage) or loss (brick).
 All tokens live at the top of `frontend/src/styles.css`. Use tokens, not raw values.
 
 ## Palette
 
-| Token | Light | Dark | Use |
-| --- | --- | --- | --- |
-| `--purple` / `--primary` | `#6C3FA0` | same | Primary buttons, active nav, CTA band, brand mark |
-| `--ink-deep` | `#2A1748` | `#1F1433` | Landing hero, portfolio card |
-| `--lime` / `--accent` | `#B7F34A` | same | Buy, sign-up CTAs, profit chip, "Live" badge (fill only) |
-| `--surface` | `#FFFFFF` | `#1B1329` | Cards, top bar |
-| `--bg` | `#FAF8FD` | `#120B1D` | Page background |
-| `--text` / `--on-accent` | `#1A1029` | `#F4F1F9` | Body text; text on lime |
-| `--muted` | `#675D7A` | `#A99FBC` | Secondary text, labels |
-| `--link` | `#6C3FA0` | `#C7AEF0` | Links, active nav text |
-| `--up` / `--down` | `#1E7A3C` / `#C62F3C` | `#B7F34A` / `#FF7A85` | Profit / loss |
+The app is **dark only** (`color-scheme: dark`). A trading terminal is read for hours on a dark surface; one
+excellent theme beats two average ones, and every contrast pair below is verified once.
 
-## Contrast rules
+| Token | Hex | Role |
+| --- | --- | --- |
+| `--espresso` / `--bg` | `#1A120E` | Page; text on tan, sage and brick fills |
+| `--roast` / `--surface` | `#21170F` | Panes, status bar, tape, auth panel (derived) |
+| `--well` | `#140E0B` | Input wells, segmented tracks (derived) |
+| `--row` | `#2A1C14` | Table row hover (derived) |
+| `--chocolate` | `#3A2418` | Active tab, button hover, result notes |
+| `--walnut` | `#6B4A2E` | Text selection, input hover border |
+| `--graphite` / `--rule` | `#4A4A46` | Hairline rules and borders |
+| `--rule-soft` | `#2E241C` | Row separators inside panes and tables (derived) |
+| `--sand` / `--text` | `#D5C4AE` | Primary text |
+| `--muted` | `#A89A88` | Secondary text, labels (derived) |
+| `--tan` / `--accent` | `#A88462` | Primary button, focus ring, logo, chart line, active underline |
+| `--tan-hi` / `--link` | `#C9A27C` | Tan *as text*: links, highlighted words, step numbers (derived) |
+| `--up` | `#A3B47C` | Profit text, Buy button (sage olive) |
+| `--down` | `#D6806A` | Loss text, Sell button (brick) |
 
-Every text/background pair in use is at least **4.5:1** (WCAG AA), light and dark.
+Rules: tan is a fill or a graphic; when tan is text, use `--tan-hi`. Never put tan text on chocolate (4.25:1).
+No other hues. Shadows appear only on the two floating objects (practice ticket, product preview).
 
-- White on purple: 7.4:1. White on ink: 16:1.
-- Lime on white is **1.3:1**: never use lime as text on light surfaces. Use it as a fill with `--on-accent` text (13.9:1).
-- On dark surfaces purple text is too dim; use `--link`.
+## Contrast (WCAG AA, all verified)
+
+| Text | Background | Ratio |
+| --- | --- | --- |
+| Sand | Espresso / Roast / Well / Row / Chocolate / Walnut | 10.85 / 10.33 / 11.24 / 9.68 / 8.53 / 4.67 |
+| Muted | Espresso / Roast / Well / Row / Chocolate | 6.72 / 6.40 / 6.96 / 6.00 / 5.29 |
+| Tan-hi | Espresso / Roast / Well / Chocolate | 7.87 / 7.49 / 8.15 / 6.19 |
+| Espresso | Tan / Tan hover `#B8956F` | 5.40 / 6.66 |
+| Espresso | Sage / hover `#B2C28C` | 8.25 / 9.67 |
+| Espresso | Brick / hover `#DF917D` | 6.29 / 7.46 |
+| Sage (profit) | Espresso / Roast / Row / Chocolate / up flash | 8.25 / 7.85 / 7.36 / 6.49 / 6.22 |
+| Brick (loss) | Espresso / Roast / Row / Chocolate / down flash | 6.29 / 5.99 / 5.61 / 4.95 / 4.97 |
+| Tan glyphs (›, focus, logo; non-text ≥ 3) | Espresso / Roast / Well | 5.40 / 5.14 / 5.60 |
 
 ## Type
 
-One family, two cuts: **Open Sans** variable (`wdth` 75–100, `wght` 300–800).
+One family: **Open Sans** variable (`wdth` 75–100, `wght` 300–800), used on two axes on purpose.
 
-- **Display** (`h1–h3`, hero, every rupee amount): condensed (`font-stretch` 75–80%), weight 700–800, tight tracking.
-- **Body**: normal width, 400/600, 16px, line-height 1.6, measure ≤ 62ch.
-- **Labels** (`.eyebrow`): 12px, 700, uppercase, +0.1em tracking.
-- Money uses `.num`: condensed + tabular figures, so columns align and values don't jitter as they update.
+- **Money and display** (`.num`, `h1–h3`, hero): condensed `75%`, weight 700, tabular lining figures, so columns
+  align and ticking prices never jitter.
+- **Labels** (`.label`): 11px, 700, uppercase, +0.08em, normal width, muted. Pane titles, column heads, stat names.
+- **Body**: normal width, 400/600, 16px (14px in dense UI), line-height 1.6, measure ≤ 62ch.
+- Brand and step titles use the semi-condensed cut (`87.5%`).
 
-Scale (`--fs-*`): 12 · 14 · 16 · 18 · 22 · 28 · 36 · fluid 36–48 · fluid hero 44–76.
+Scale (`--fs-*`): 11 · 12 · 14 · 16 · 20 · 24 · 32 · 48 · hero fluid 40–76.
+
+## Spacing and shape
+
+- 4-point scale (`--s-1`…`--s-9`: 4, 8, 12, 16, 24, 32, 48, 64, 96). Container 1200px; 24px gutters, 16px on mobile.
+- Radii 4px (controls) and 6px (panes). Controls 40px tall; 32px small; 48px large.
+- **Rules before boxes.** Tables are rows between hairlines, never boxed. The dashboard summary is one ruled strip.
+  A **pane** (roast fill, graphite border, 40px header bar with a label and meta) is used only for things that
+  are a unit: order ticket, details, position, funds, top holdings, Kite connection.
+
+## Layout signature
+
+- **App shell** like a terminal: a 48px command bar (brand, tabbed nav with `1`–`5` key hints, cash), and a 28px
+  status bar fixed at the bottom with NSE session state, a live IST clock and shortcut hints.
+- **Keyboard**: `1`–`5` switch pages, `/` focuses instrument search. Ignored while typing.
+- **Landing sections** use a label gutter: heading in the left 4 columns (sticky), content in the right 8.
 
 ## Logo
 
-A lime growth arrow rising inside a purple rounded tile (`components/BrandMark.jsx`, same artwork in `public/favicon.svg`).
-On hover the arrow redraws itself.
-
-## Spacing and layout
-
-- 8-point scale (`--s-1`…`--s-10`: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128).
-- Content max width 1160px; 24px gutters (16px on mobile).
-- **Depth means "floats".** Only things that sit above the page get a shadow: the practice ticket, product preview,
-  portfolio card and the trade form. Everyday surfaces are flat: hairline border, 14px radius.
-- **Avoid rows of identical boxes.** Shape follows content: related stats share one ruled strip; comparisons are a
-  table; paired lists are a ledger split by one rule; FAQs are a hairline list. Section starts are marked by a 2px rule.
-- Controls are 44px tall (36px small, 54px large CTAs).
+A standalone line-drawn growth arrow, no tile (`components/BrandMark.jsx`, `public/favicon.svg`). Stroke is
+`currentColor`: tan on dark surfaces; the favicon switches to walnut on light browser chrome via
+`prefers-color-scheme`. On hover the arrow redraws.
 
 ## Buttons
 
-One system for `<button>` and links styled as buttons (`.btn`). Never nest a button inside a link.
+`<button>` and `.btn` share one system. Keycap model: a 2px inner base shadow.
 
-- Variants: `.primary` (purple), `.accent` / `.buy` (lime), `.sell` (red), `.ghost`, default (outlined).
-- Hover: 1px lift and a deeper coloured shadow; brand buttons also get a light **sheen** that sweeps across.
-- Press: settles down and scales to 98.5%.
-- `.btn-arrow` adds an arrow that springs right on hover. Busy buttons show a `.spinner` and set `aria-busy`.
-
-## Login and sign-up
-
-Split screen: the form on a white half, and an ink panel on the other with a live (simulated) NIFTY chart and
-"order filled" cards that slide in every few seconds. The panel is decorative (`aria-hidden`) and hidden below 900px.
+- Variants: `.primary` (tan), `.buy` (sage), `.sell` (brick), default (graphite outline), `.btn-quiet`.
+- Hover (120ms): fill steps one shade; outlined buttons take a chocolate fill and tan border. `.btn-arrow` nudges 3px.
+- Press (80ms): drops 1px and the base flattens. Busy: `.spinner` + `aria-busy`. Focus: 2px tan ring.
 
 ## Motion
 
-Purposeful and quick (`--ease`, 0.35–0.9s). All of it is disabled under `prefers-reduced-motion`.
+Fast and precise, 80–280ms on `--ease`. Everything is disabled under `prefers-reduced-motion`.
 
-- **Landing load**: hero copy rises in sequence; the practice ticket follows.
-- **Scroll**: sections rise in once, staggered (`.reveal` + `useReveal`).
-- **Prices**: a brief green/red flash when a price ticks (`useTickDirection`).
-- **Portfolio value**: rolls to each new value instead of jumping (`useTween`).
-- **Navigation**: each app page fades up. Loading states use shimmer placeholders, not spinners.
+- **Tick flash**: a price cell washes sage or brick for 700ms in the direction of the move (`useTickDirection`).
+- **Rows**: hover lights the row and draws a 2px tan edge.
+- **Page load**: app pages settle in (4px, 200ms); a tan segment sweeps the page-head rule once.
+- **Landing**: hero lines rise in 60ms steps, a block cursor blinks after the headline, and a scan line passes
+  over the practice ticket once. The product preview gets the same scan when it scrolls into view.
+- **Scroll**: sections reveal once, 8px, staggered 70ms (`.reveal` + `useReveal`).
+- **Auth**: new fills print to the order log with a brief chocolate highlight.
 
-## Landing page
+## Pages
 
-The hero's signature is a working practice ticket with a live intraday chart: visitors buy, watch the entry line
-and live P&L, and sell before signing up. Below the hero runs a ticker tape of sample prices (labelled as such).
-Then: how it works, a browser-framed product preview that tilts upright on scroll, the markets comparison table,
-the real-vs-practice ledger, FAQ, closing CTA and footer.
+- **Landing**: hero thesis is the working practice ticket (simulated prices, buy, watch entry line and live P&L,
+  sell). Under it a ticker tape labelled "Sample". Then the three-step sequence, product preview, markets table,
+  real-vs-practice ledger, FAQ, a ruled command-line CTA and footer.
+- **Auth**: split screen. Form on espresso; roast panel with a live NIFTY pane and an order log (decorative,
+  `aria-hidden`, hidden below 900px). Sign-up states the fixed ₹1,00,000 start and the ₹10,00,000 deposit cap.
+- **Dashboard**: summary strip, then top holdings and "Add practice funds" with a deposit-cap meter.
+- **Trade**: quote header with a large ticking price; details and position panes; sticky order ticket.
 
-Everything on the landing and auth pages runs in the browser on simulated prices (`components/landing/sim.js`) and
-never calls the API. Sample figures are always labelled "Simulated" or "Sample".
+Everything on landing and auth runs on simulated prices in the browser (`components/landing/sim.js`) and never
+calls the API. Sample figures are always labelled "Simulated" or "Sample".
