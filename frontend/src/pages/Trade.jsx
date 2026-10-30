@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api/client.js";
-import { ErrorText, Pnl, Skeleton, SourceBadge, TypeTag } from "../components/ui.jsx";
+import { ErrorText, Pane, Pnl, Skeleton, SourceBadge, TypeTag } from "../components/ui.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { money, pct, tone } from "../format.js";
 import { PRICE_REFRESH_MS, useApi, useTickDirection } from "../hooks.js";
@@ -17,9 +17,13 @@ function Details({ q }) {
     q.strike && ["Strike", money(q.strike)],
     q.lot_size > 1 && ["Lot size", q.lot_size],
   ].filter(Boolean);
-  return rows.map(([k, v]) => (
-    <div className="kv" key={k}><span className="muted">{k}</span><span>{v}</span></div>
-  ));
+  return (
+    <dl className="kvs">
+      {rows.map(([k, v]) => (
+        <div className="kv" key={k}><dt>{k}</dt><dd className="num">{v}</dd></div>
+      ))}
+    </dl>
+  );
 }
 
 function OrderForm({ q, holding, onFilled }) {
@@ -65,10 +69,12 @@ function OrderForm({ q, holding, onFilled }) {
   };
 
   return (
-    <form className="card" onSubmit={submit}>
-      <div className="segmented" style={{ marginBottom: 16 }}>
+    <Pane as="form" title="Order ticket" meta={<span className="muted">Market · instant fill</span>}
+      className={`order-ticket side-is-${side}`} onSubmit={submit}>
+      <div className="segmented segmented-side" role="group" aria-label="Side">
         {["BUY", "SELL"].map((s) => (
-          <button type="button" key={s} className={side === s ? "on" : ""} onClick={() => { setSide(s); setResult(null); }}>
+          <button type="button" key={s} className={side === s ? `on on-${s}` : ""} aria-pressed={side === s}
+            onClick={() => { setSide(s); setResult(null); }}>
             {s === "BUY" ? "Buy" : "Sell"}
           </button>
         ))}
@@ -76,40 +82,43 @@ function OrderForm({ q, holding, onFilled }) {
 
       <div className="field">
         <label htmlFor="units">{isFno ? `Lots (1 lot = ${q.lot_size})` : "Quantity"}</label>
-        <input id="units" type="number" min="1" step="1" value={units} onChange={(e) => setUnits(e.target.value)} />
+        <input id="units" className="num" type="number" min="1" step="1" value={units} onChange={(e) => setUnits(e.target.value)} />
       </div>
 
-      <div className="kv"><span className="muted">Quantity</span><span>{qty}</span></div>
-      <div className="kv"><span className="muted">Order value</span><span>{money(value)}</span></div>
-      {isFut && side === "BUY" && (
-        <div className="kv"><span className="muted">Margin blocked (15%)</span><span>{money(required)}</span></div>
-      )}
-      {side === "BUY" ? (
-        <div className="kv"><span className="muted">Available cash</span><span>{money(user.cash)}</span></div>
-      ) : (
-        <>
-          <div className="kv"><span className="muted">You hold</span><span>{held}</span></div>
-          {holding && qty > 0 && qty <= held && (
-            <div className="kv"><span className="muted">Est. P&L on this sale</span><Pnl value={estPnl} /></div>
-          )}
-        </>
-      )}
+      <dl className="kvs">
+        <div className="kv"><dt>Quantity</dt><dd className="num">{qty}</dd></div>
+        <div className="kv"><dt>Order value</dt><dd className="num">{money(value)}</dd></div>
+        {isFut && side === "BUY" && (
+          <div className="kv"><dt>Margin blocked (15%)</dt><dd className="num">{money(required)}</dd></div>
+        )}
+        {side === "BUY" ? (
+          <div className="kv"><dt>Available cash</dt><dd className="num">{money(user.cash)}</dd></div>
+        ) : (
+          <>
+            <div className="kv"><dt>You hold</dt><dd className="num">{held}</dd></div>
+            {holding && qty > 0 && qty <= held && (
+              <div className="kv"><dt>Est. P&amp;L on this sale</dt><dd><Pnl value={estPnl} /></dd></div>
+            )}
+          </>
+        )}
+      </dl>
 
-      <p className="muted small" style={{ margin: "12px 0" }}>Executes instantly at the live price. Dummy money only.</p>
+      <p className="muted small ticket-note">Executes instantly at the live price. Dummy money only.</p>
       {blocker && qty > 0 && <p className="error">{blocker}</p>}
       <ErrorText>{error}</ErrorText>
-      <button className={`btn-block ${side === "BUY" ? "buy" : "sell"}`} disabled={busy || Boolean(blocker)}>
+      <button className={`btn-block btn-lg ${side === "BUY" ? "buy" : "sell"}`} disabled={busy || Boolean(blocker)} aria-busy={busy}>
         {busy ? <><span className="spinner" />Placing order…</> : `${side === "BUY" ? "Buy" : "Sell"} ${qty || ""} ${q.symbol}`}
       </button>
 
       {result && (
-        <div className="success" style={{ marginTop: 12 }}>
-          {result.side === "BUY" ? "Bought" : "Sold"} {result.quantity} @ {money(result.price)}.
-          {result.pnl_type === "realized" && <> Realised P&L: <Pnl value={result.pnl} />.</>}{" "}
+        <div className="fill-note" role="status">
+          <span className={`side side-${result.side}`}>{result.side === "BUY" ? "Bought" : "Sold"}</span>{" "}
+          <span className="num">{result.quantity} @ {money(result.price)}</span>
+          {result.pnl_type === "realized" && <> · Realised <Pnl value={result.pnl} /></>}{" "}
           <Link to="/orders">View orders</Link>
         </div>
       )}
-    </form>
+    </Pane>
   );
 }
 
@@ -128,18 +137,18 @@ export default function Trade() {
   if (!q) {
     return (
       <div className="trade-grid">
-        <Skeleton height={220} style={{ borderRadius: "var(--radius)" }} />
-        <Skeleton height={380} style={{ borderRadius: "var(--radius)" }} />
+        <Skeleton height={220} />
+        <Skeleton height={380} />
       </div>
     );
   }
 
   return (
     <div className="stack">
-      <Link to="/explore" className="small">← Explore</Link>
+      <Link to="/explore" className="back small">← Explore</Link>
       <div className="trade-grid">
-        <div className="stack">
-          <div className="card">
+        <div className="stack-lg">
+          <section className="quote" aria-label="Quote">
             <div className="spread">
               <div>
                 <h1>{q.symbol} <TypeTag type={q.instrument_type} /></h1>
@@ -147,23 +156,21 @@ export default function Trade() {
               </div>
               <SourceBadge source={summary?.price_source} />
             </div>
-            <div className={`price-big ${tick}`}>{money(q.ltp)}</div>
-            <div className={tone(q.change)} style={{ fontWeight: 600, marginTop: "var(--s-1)" }}>
+            <div className={`price-big num ${tick}`} aria-live="off">{money(q.ltp)}</div>
+            <div className={`num quote-change ${tone(q.change)}`}>
               {q.change > 0 ? "+" : ""}{q.change.toFixed(2)} ({pct(q.change_pct)}) today
             </div>
-          </div>
-          <div className="card">
-            <h2>Details</h2>
-            <Details q={q} />
-          </div>
+          </section>
+          <Pane title="Details"><Details q={q} /></Pane>
           {holding && (
-            <div className="card">
-              <h2>Your position</h2>
-              <div className="kv"><span className="muted">Quantity</span><span>{holding.quantity}</span></div>
-              <div className="kv"><span className="muted">Avg price</span><span>{money(holding.avg_price)}</span></div>
-              <div className="kv"><span className="muted">Invested</span><span>{money(holding.invested)}</span></div>
-              <div className="kv"><span className="muted">P&L</span><Pnl value={holding.pnl} percent={holding.pnl_pct} /></div>
-            </div>
+            <Pane title="Your position">
+              <dl className="kvs">
+                <div className="kv"><dt>Quantity</dt><dd className="num">{holding.quantity}</dd></div>
+                <div className="kv"><dt>Avg price</dt><dd className="num">{money(holding.avg_price)}</dd></div>
+                <div className="kv"><dt>Invested</dt><dd className="num">{money(holding.invested)}</dd></div>
+                <div className="kv"><dt>P&amp;L</dt><dd><Pnl value={holding.pnl} percent={holding.pnl_pct} /></dd></div>
+              </dl>
+            </Pane>
           )}
         </div>
         <OrderForm q={q} holding={holding} onFilled={() => { holdings.reload(); quote.reload(); }} />

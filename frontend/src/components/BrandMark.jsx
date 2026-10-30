@@ -1,12 +1,11 @@
-// Logo: a lime growth arrow rising inside the purple tile. Same artwork as public/favicon.svg.
-export default function BrandMark({ size = 28 }) {
+// Logo: a line-drawn growth arrow, no tile. Colour comes from `currentColor`,
+// so each surface sets it (tan on espresso). Same artwork as public/favicon.svg.
+export default function BrandMark({ size = 22 }) {
   return (
-    <svg className="brand-mark" width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="9" fill="#6C3FA0" />
-      <path d="M7 22.5 L13 16.5 L17 20 L24.5 11.5" fill="none" stroke="#B7F34A" strokeWidth="3"
-        strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M18.5 10.5 H25.5 V17.5" fill="none" stroke="#B7F34A" strokeWidth="3"
-        strokeLinecap="round" strokeLinejoin="round" />
+    <svg className="brand-mark" width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor"
+      strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 24 L11 15.5 L17 20.5 L28 8" />
+      <path d="M20 8 H28 V16" />
     </svg>
   );
 }

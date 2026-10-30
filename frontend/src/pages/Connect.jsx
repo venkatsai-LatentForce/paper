@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../api/client.js";
-import { ErrorText, PageHead } from "../components/ui.jsx";
+import { ErrorText, PageHead, Pane } from "../components/ui.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { dateTime } from "../format.js";
 import { useApi } from "../hooks.js";
@@ -67,33 +67,30 @@ export default function Connect() {
   };
 
   return (
-    <div className="stack" style={{ maxWidth: 620 }}>
+    <div className="stack narrow">
       <PageHead eyebrow="Live prices" title="Connect Kite">
         Link your own Zerodha Kite Connect app to trade at live market prices.
         Until then, the app uses simulated prices so you can practise right away.
       </PageHead>
 
-      {message && <p className="success">{message}</p>}
+      {message && <p className="success" role="status">{message}</p>}
       <ErrorText>{error}</ErrorText>
       {busy && <p className="muted small">Connecting to Kite…</p>}
 
       {s?.connected ? (
-        <div className="card">
+        <Pane title="Kite connection" meta={<span className="status status-live"><i aria-hidden="true" />Connected</span>}>
           <div className="spread">
-            <div>
-              <h2>Connected</h2>
-              <p className="muted small">
-                {s.user_name && <>Kite user {s.user_name} · </>}
-                since {dateTime(s.connected_at)}. Kite sessions end at 6 AM IST; reconnect daily.
-              </p>
-            </div>
+            <p className="muted small">
+              {s.user_name && <>Kite user <span className="text">{s.user_name}</span> · </>}
+              since <span className="num">{dateTime(s.connected_at)}</span>. Kite sessions end at 6 AM IST; reconnect daily.
+            </p>
             <button onClick={disconnect}>Disconnect</button>
           </div>
-        </div>
+        </Pane>
       ) : s && (
-        <form className="card" onSubmit={startLogin}>
-          <h2>Link your Kite Connect app</h2>
-          <ol className="muted small" style={{ paddingLeft: 18, margin: "0 0 var(--s-5)", lineHeight: 1.9 }}>
+        <Pane as="form" title="Link your Kite Connect app" meta={<span className="status"><i aria-hidden="true" />Not connected</span>}
+          onSubmit={startLogin}>
+          <ol className="steps-list">
             <li>Create an app at developers.kite.trade.</li>
             <li>Set its redirect URL to <code>{redirectUrl}</code>.</li>
             <li>Enter its API key and secret below and log in with Kite.</li>
@@ -112,13 +109,13 @@ export default function Connect() {
               </div>
             </>
           )}
-          <button className="primary" disabled={busy}>Log in with Kite</button>
+          <button className="primary btn-arrow" disabled={busy}>Log in with Kite</button>
           {s.price_provider === "mock" && (
-            <p className="muted small" style={{ marginTop: 12 }}>
+            <p className="muted small ticket-note">
               Note: the server is set to PRICE_PROVIDER=mock, so prices stay simulated even when connected.
             </p>
           )}
-        </form>
+        </Pane>
       )}
     </div>
   );
