@@ -33,8 +33,8 @@ async def register(body: RegisterIn):
         "name": body.name.strip(),
         "email": body.email.lower(),
         "password_hash": hash_password(body.password),
-        "cash": body.starting_balance,
-        "total_deposited": body.starting_balance,
+        "cash": float(settings.default_balance),
+        "total_deposited": float(settings.default_balance),
         "created_at": datetime.now(timezone.utc),
     }
     try:

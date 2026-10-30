@@ -2,8 +2,8 @@
 
 ## Balance
 
-- At sign-up the user picks a starting balance, up to **₹10,00,000**.
-- Top-ups are allowed until lifetime deposits (`total_deposited`) reach ₹10,00,000.
+- Every new account starts with **₹1,00,000** (`DEFAULT_BALANCE`). Sign-up asks for no amount.
+- Users add more from the dashboard until lifetime deposits (`total_deposited`) reach **₹10,00,000** (`MAX_DEPOSIT`).
 - Past that, the balance grows only through trading profits.
 - Total P&L = portfolio value − total deposited.
 

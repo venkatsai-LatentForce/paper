@@ -10,6 +10,7 @@ Backend settings come from environment variables or `backend/.env` (see `backend
 | `JWT_EXPIRE_MINUTES` | `10080` (7 days) | |
 | `PRICE_PROVIDER` | `auto` | `auto` \| `mock` \| `kite`, see [kite-connect.md](kite-connect.md) |
 | `KITE_API_KEY` / `KITE_API_SECRET` | empty | Optional app-wide Kite app |
-| `MAX_DEPOSIT` | `1000000` | Starting balance and lifetime top-up cap (₹) |
+| `DEFAULT_BALANCE` | `100000` | Practice money every new account starts with (₹) |
+| `MAX_DEPOSIT` | `1000000` | Lifetime deposit cap (₹), starting balance included |
 
 With Docker Compose, put overrides in a `.env` file next to `docker-compose.yml`.

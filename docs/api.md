@@ -5,7 +5,7 @@ Interactive docs: `http://localhost:8000/docs`.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| POST | `/auth/register` | `{name, email, password, starting_balance}` → `{access_token}` |
+| POST | `/auth/register` | `{name, email, password}` → `{access_token}`; account starts with `DEFAULT_BALANCE` |
 | POST | `/auth/login` | `{email, password}` → `{access_token}` |
 | GET | `/me` | Current user, cash, deposits, Kite status |
 | POST | `/me/topup` | `{amount}`; rejected past the ₹10,00,000 lifetime cap |

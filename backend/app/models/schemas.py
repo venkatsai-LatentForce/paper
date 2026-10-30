@@ -3,8 +3,6 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
-from ..config import settings
-
 InstrumentType = Literal["EQ", "FUT", "CE", "PE"]
 Side = Literal["BUY", "SELL"]
 
@@ -14,7 +12,6 @@ class RegisterIn(BaseModel):
     name: str = Field(min_length=1, max_length=80)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
-    starting_balance: float = Field(gt=0, le=settings.max_deposit)
 
 
 class LoginIn(BaseModel):

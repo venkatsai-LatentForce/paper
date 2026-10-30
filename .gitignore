@@ -24,3 +24,6 @@ frontend/dist/
 
 # Docker
 *.pid
+
+# Local Claude tooling (worktrees, launch configs)
+.claude/

@@ -21,7 +21,9 @@ class Settings(BaseSettings):
     kite_api_key: str = ""
     kite_api_secret: str = ""
 
-    # Business rules: starting-balance / top-up cap in INR.
+    # Business rules (INR): every account starts with default_balance and can
+    # top up until lifetime deposits reach max_deposit.
+    default_balance: int = 100_000  # Rs 1,00,000
     max_deposit: int = 1_000_000  # Rs 10,00,000
 
 
