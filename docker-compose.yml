@@ -1,0 +1,32 @@
+# Paper Trading App — full stack in Docker.
+# `docker compose up --build` brings up MongoDB and the app (React build served by FastAPI).
+services:
+  mongo:
+    image: mongo:8
+    container_name: paper-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    # Not exposed to the host by default; the app talks to it over the compose network.
+    expose:
+      - "27017"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: paper-app
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: paper_trading
+      # Override these in a .env file or your shell for production.
+      JWT_SECRET: ${JWT_SECRET:-dev-insecure-change-me}
+      PRICE_PROVIDER: ${PRICE_PROVIDER:-auto}
+    ports:
+      - "8000:8000"
+
+volumes:
+  mongo-data:
