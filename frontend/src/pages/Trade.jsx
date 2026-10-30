@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api/client.js";
-import { ErrorText, Pnl, SourceBadge, TypeTag } from "../components/ui.jsx";
+import { ErrorText, Pnl, Skeleton, SourceBadge, TypeTag } from "../components/ui.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { money, pct, tone } from "../format.js";
-import { PRICE_REFRESH_MS, useApi } from "../hooks.js";
+import { PRICE_REFRESH_MS, useApi, useTickDirection } from "../hooks.js";
 
 // Must match FUT_MARGIN_RATE in backend/app/services/trading.py.
 const FUT_MARGIN_RATE = 0.15;
@@ -119,12 +119,20 @@ export default function Trade() {
   const holdings = useApi("/holdings");
   const { data: summary } = useApi("/dashboard");
   const q = quote.data;
+  const tick = useTickDirection(q?.ltp);
   const holding = holdings.data?.find((h) => h.symbol === symbol && h.exchange === exchange);
 
   if (quote.error && !q) {
     return <div className="stack"><ErrorText>{quote.error}</ErrorText><Link to="/explore">Back to Explore</Link></div>;
   }
-  if (!q) return <p className="muted">Loading…</p>;
+  if (!q) {
+    return (
+      <div className="trade-grid">
+        <Skeleton height={220} style={{ borderRadius: "var(--radius)" }} />
+        <Skeleton height={380} style={{ borderRadius: "var(--radius)" }} />
+      </div>
+    );
+  }
 
   return (
     <div className="stack">
@@ -139,8 +147,8 @@ export default function Trade() {
               </div>
               <SourceBadge source={summary?.price_source} />
             </div>
-            <div className="price-big">{money(q.ltp)}</div>
-            <div className={tone(q.change)}>
+            <div className={`price-big ${tick}`}>{money(q.ltp)}</div>
+            <div className={tone(q.change)} style={{ fontWeight: 600, marginTop: "var(--s-1)" }}>
               {q.change > 0 ? "+" : ""}{q.change.toFixed(2)} ({pct(q.change_pct)}) today
             </div>
           </div>

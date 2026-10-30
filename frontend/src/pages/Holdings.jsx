@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Empty, ErrorText, Pnl, SourceBadge, TypeTag } from "../components/ui.jsx";
+import { Empty, ErrorText, PageHead, Pnl, SourceBadge, TableSkeleton, TypeTag } from "../components/ui.jsx";
 import { money } from "../format.js";
 import { PRICE_REFRESH_MS, useApi } from "../hooks.js";
 
@@ -13,22 +13,18 @@ export default function Holdings() {
 
   return (
     <div className="stack">
-      <div className="spread page-head">
-        <div>
-          <h1>Holdings</h1>
-          {data?.length > 0 && (
-            <p className="muted small">
-              Invested {money(invested)} · Open P&L <Pnl value={pnl} percent={invested ? (pnl / invested) * 100 : 0} />
-            </p>
-          )}
-        </div>
-        <SourceBadge source={summary?.price_source} />
-      </div>
+      <PageHead eyebrow="Portfolio" title="Holdings" aside={<SourceBadge source={summary?.price_source} />}>
+        {data?.length > 0 && (
+          <>Invested <span className="num" style={{ fontWeight: 700, color: "var(--text)" }}>{money(invested)}</span> · Open P&amp;L{" "}
+            <Pnl value={pnl} percent={invested ? (pnl / invested) * 100 : 0} /></>
+        )}
+      </PageHead>
       <ErrorText>{error}</ErrorText>
 
-      {loading ? null : !data?.length ? (
+      {loading ? <TableSkeleton /> : !data?.length ? (
         <Empty>
-          You don't hold anything yet. <Link to="/explore">Explore instruments</Link> to place your first trade.
+          <p>You don't hold anything yet.</p>
+          <Link to="/explore"><button className="primary">Explore instruments</button></Link>
         </Empty>
       ) : (
         <div className="table-wrap">
@@ -36,7 +32,7 @@ export default function Holdings() {
             <thead>
               <tr>
                 <th>Instrument</th><th>Qty</th><th>Avg price</th><th>LTP</th>
-                <th>Invested</th><th>Current</th><th>P&L</th>
+                <th>Invested</th><th>Current</th><th>P&amp;L</th>
               </tr>
             </thead>
             <tbody>
@@ -45,7 +41,7 @@ export default function Holdings() {
                   onClick={() => navigate(`/trade/${h.exchange}/${encodeURIComponent(h.symbol)}`)}>
                   <td>
                     <div className="sym">{h.symbol} <TypeTag type={h.instrument_type} /></div>
-                    <div className="muted small">{h.name}</div>
+                    <div className="sub">{h.name}</div>
                   </td>
                   <td>{h.quantity}</td>
                   <td>{money(h.avg_price)}</td>
@@ -60,7 +56,7 @@ export default function Holdings() {
         </div>
       )}
       {data?.some((h) => h.instrument_type === "FUT") && (
-        <p className="muted small">Futures show the margin blocked (15% of contract value) as invested.</p>
+        <p className="muted small">For futures, “Invested” is the margin blocked: 15% of the contract value.</p>
       )}
     </div>
   );

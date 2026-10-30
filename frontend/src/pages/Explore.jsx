@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ErrorText, TypeTag } from "../components/ui.jsx";
+import { ErrorText, PageHead, TableSkeleton, TypeTag } from "../components/ui.jsx";
 import { money, pct, tone } from "../format.js";
 import { useApi } from "../hooks.js";
 
@@ -34,12 +34,12 @@ function QuoteTable({ rows }) {
               onClick={() => navigate(`/trade/${q.exchange}/${encodeURIComponent(q.symbol)}`)}>
               <td>
                 <div className="sym">{q.symbol}</div>
-                <div className="muted small">{q.name}</div>
+                <div className="sub">{q.name}</div>
               </td>
               <td><TypeTag type={q.instrument_type} /></td>
               <td>{q.lot_size}</td>
               <td>{money(q.ltp)}</td>
-              <td className={tone(q.change)}>{pct(q.change_pct)}</td>
+              <td className={tone(q.change)} style={{ fontWeight: 600 }}>{pct(q.change_pct)}</td>
             </tr>
           ))}
         </tbody>
@@ -62,13 +62,12 @@ export default function Explore() {
 
   return (
     <div className="stack">
-      <div className="page-head">
-        <h1>Explore</h1>
-        <p className="muted small">Search stocks, futures and options. Try “RELIANCE”, “NIFTY” or “BANKNIFTY FUT”.</p>
-      </div>
+      <PageHead eyebrow="Markets" title="Explore">
+        Search stocks, futures and options. Try “RELIANCE”, “NIFTY” or “BANKNIFTY FUT”.
+      </PageHead>
 
-      <input autoFocus placeholder="Search by symbol or company name" value={query}
-        onChange={(e) => setQuery(e.target.value)} />
+      <input autoFocus type="search" aria-label="Search instruments" placeholder="Search by symbol or company name"
+        value={query} onChange={(e) => setQuery(e.target.value)} style={{ height: 52, fontSize: "var(--fs-md)" }} />
 
       {q ? (
         <>
@@ -79,18 +78,18 @@ export default function Explore() {
           </div>
           <ErrorText>{search.error}</ErrorText>
           {search.loading ? (
-            <p className="muted small">Searching…</p>
+            <TableSkeleton rows={4} />
           ) : rows.length ? (
             <QuoteTable rows={rows} />
           ) : (
-            <p className="muted small">No matches.</p>
+            <p className="muted small">No instruments match “{q}”. Check the symbol, or try the company name.</p>
           )}
         </>
       ) : (
         <>
-          <h2>Popular stocks</h2>
+          <h2 style={{ marginTop: "var(--s-6)" }}>Popular stocks</h2>
           <ErrorText>{popular.error}</ErrorText>
-          {popular.data && <QuoteTable rows={popular.data} />}
+          {popular.data ? <QuoteTable rows={popular.data} /> : !popular.error && <TableSkeleton rows={6} />}
         </>
       )}
     </div>

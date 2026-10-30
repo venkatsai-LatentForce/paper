@@ -2,19 +2,32 @@ import { pct, signedMoney, tone, TYPE_LABEL } from "../format.js";
 
 export function Pnl({ value, percent }) {
   return (
-    <span className={tone(value)}>
+    <span className={`num ${tone(value)}`} style={{ fontWeight: 700 }}>
       {signedMoney(value)}
-      {percent !== undefined && <span className="small"> ({pct(percent)})</span>}
+      {percent !== undefined && <span className="small" style={{ fontWeight: 600 }}> ({pct(percent)})</span>}
     </span>
   );
 }
 
-export function Stat({ label, children, hint, hero }) {
+export function Stat({ label, children, hint }) {
   return (
-    <div className={`card stat${hero ? " stat-hero" : ""}`}>
-      <div className="muted small">{label}</div>
+    <div className="card">
+      <span className="eyebrow">{label}</span>
       <div className="stat-value">{children}</div>
-      {hint && <div className="muted small">{hint}</div>}
+      {hint && <div className="stat-hint">{hint}</div>}
+    </div>
+  );
+}
+
+export function PageHead({ eyebrow, title, children, aside }) {
+  return (
+    <div className="page-head">
+      <div>
+        {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+        <h1>{title}</h1>
+        {children && <p>{children}</p>}
+      </div>
+      {aside}
     </div>
   );
 }
@@ -30,6 +43,18 @@ export function SourceBadge({ source }) {
       title={source === "kite" ? "Live prices from Kite" : "Simulated prices"}>
       {source === "kite" ? "Live · Kite" : "Simulated prices"}
     </span>
+  );
+}
+
+export function Skeleton({ height = 16, width = "100%", style }) {
+  return <div className="skeleton" style={{ height, width, ...style }} aria-hidden="true" />;
+}
+
+export function TableSkeleton({ rows = 5 }) {
+  return (
+    <div className="card stack" aria-busy="true">
+      {Array.from({ length: rows }, (_, i) => <Skeleton key={i} height={28} />)}
+    </div>
   );
 }
 

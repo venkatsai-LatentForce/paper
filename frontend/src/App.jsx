@@ -12,7 +12,7 @@ import Trade from "./pages/Trade.jsx";
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="center muted">Loading…</div>;
+  if (loading) return <div className="center muted small">Loading your account…</div>;
   return user ? <Layout>{children}</Layout> : <Navigate to="/login" replace />;
 }
 

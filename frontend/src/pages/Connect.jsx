@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../api/client.js";
-import { ErrorText } from "../components/ui.jsx";
+import { ErrorText, PageHead } from "../components/ui.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { dateTime } from "../format.js";
 import { useApi } from "../hooks.js";
@@ -68,13 +68,10 @@ export default function Connect() {
 
   return (
     <div className="stack" style={{ maxWidth: 620 }}>
-      <div className="page-head">
-        <h1>Connect Kite</h1>
-        <p className="muted small">
-          Link your own Zerodha Kite Connect app to trade at live market prices.
-          Until then, the app uses simulated prices so you can practise right away.
-        </p>
-      </div>
+      <PageHead eyebrow="Live prices" title="Connect Kite">
+        Link your own Zerodha Kite Connect app to trade at live market prices.
+        Until then, the app uses simulated prices so you can practise right away.
+      </PageHead>
 
       {message && <p className="success">{message}</p>}
       <ErrorText>{error}</ErrorText>
@@ -96,7 +93,7 @@ export default function Connect() {
       ) : s && (
         <form className="card" onSubmit={startLogin}>
           <h2>Link your Kite Connect app</h2>
-          <ol className="muted small" style={{ paddingLeft: 18 }}>
+          <ol className="muted small" style={{ paddingLeft: 18, margin: "0 0 var(--s-5)", lineHeight: 1.9 }}>
             <li>Create an app at developers.kite.trade.</li>
             <li>Set its redirect URL to <code>{redirectUrl}</code>.</li>
             <li>Enter its API key and secret below and log in with Kite.</li>
