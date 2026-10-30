@@ -36,12 +36,34 @@ One family, two cuts: **Open Sans** variable (`wdth` 75–100, `wght` 300–800)
 
 Scale (`--fs-*`): 12 · 14 · 16 · 18 · 22 · 28 · 36 · fluid 36–48 · fluid hero 44–76.
 
+## Logo
+
+A lime growth arrow rising inside a purple rounded tile (`components/BrandMark.jsx`, same artwork in `public/favicon.svg`).
+On hover the arrow redraws itself.
+
 ## Spacing and layout
 
-- 8-point scale (`--s-1`…`--s-9`: 4, 8, 12, 16, 24, 32, 48, 64, 96).
-- Content max width 1120px; 24px gutters (16px on mobile).
-- Cards: 14px radius, hairline border, soft layered shadow. Hero surfaces: 20px radius.
-- Controls are 44px tall (52px for large CTAs).
+- 8-point scale (`--s-1`…`--s-10`: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128).
+- Content max width 1160px; 24px gutters (16px on mobile).
+- **Depth means "floats".** Only things that sit above the page get a shadow: the practice ticket, product preview,
+  portfolio card and the trade form. Everyday surfaces are flat: hairline border, 14px radius.
+- **Avoid rows of identical boxes.** Shape follows content: related stats share one ruled strip; comparisons are a
+  table; paired lists are a ledger split by one rule; FAQs are a hairline list. Section starts are marked by a 2px rule.
+- Controls are 44px tall (36px small, 54px large CTAs).
+
+## Buttons
+
+One system for `<button>` and links styled as buttons (`.btn`). Never nest a button inside a link.
+
+- Variants: `.primary` (purple), `.accent` / `.buy` (lime), `.sell` (red), `.ghost`, default (outlined).
+- Hover: 1px lift and a deeper coloured shadow; brand buttons also get a light **sheen** that sweeps across.
+- Press: settles down and scales to 98.5%.
+- `.btn-arrow` adds an arrow that springs right on hover. Busy buttons show a `.spinner` and set `aria-busy`.
+
+## Login and sign-up
+
+Split screen: the form on a white half, and an ink panel on the other with a live (simulated) NIFTY chart and
+"order filled" cards that slide in every few seconds. The panel is decorative (`aria-hidden`) and hidden below 900px.
 
 ## Motion
 
@@ -55,5 +77,10 @@ Purposeful and quick (`--ease`, 0.35–0.9s). All of it is disabled under `prefe
 
 ## Landing page
 
-The hero's signature is a working practice ticket: visitors buy, watch live P&L and sell before signing up.
-It runs entirely in the browser on simulated prices and never calls the API.
+The hero's signature is a working practice ticket with a live intraday chart: visitors buy, watch the entry line
+and live P&L, and sell before signing up. Below the hero runs a ticker tape of sample prices (labelled as such).
+Then: how it works, a browser-framed product preview that tilts upright on scroll, the markets comparison table,
+the real-vs-practice ledger, FAQ, closing CTA and footer.
+
+Everything on the landing and auth pages runs in the browser on simulated prices (`components/landing/sim.js`) and
+never calls the API. Sample figures are always labelled "Simulated" or "Sample".

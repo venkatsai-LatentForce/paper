@@ -18,7 +18,7 @@ export default function Orders() {
       {loading ? <TableSkeleton /> : !data?.length ? (
         <Empty>
           <p>No orders yet.</p>
-          <Link to="/explore"><button className="primary">Place your first trade</button></Link>
+          <Link to="/explore" className="btn primary">Place your first trade</Link>
         </Empty>
       ) : (
         <div className="table-wrap">

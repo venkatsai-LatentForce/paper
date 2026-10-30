@@ -93,6 +93,18 @@ export function useTween(value, ms = 700) {
   return shown;
 }
 
+// True once the page has scrolled past `offset` pixels.
+export function useScrolled(offset = 16) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > offset);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [offset]);
+  return scrolled;
+}
+
 // "tick-up" / "tick-down" for a moment whenever `value` moves.
 export function useTickDirection(value) {
   const [dir, setDir] = useState("");

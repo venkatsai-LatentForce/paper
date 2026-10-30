@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AuthPanel from "../components/AuthPanel.jsx";
+import BrandMark from "../components/BrandMark.jsx";
 import { ErrorText } from "../components/ui.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -26,14 +28,18 @@ function useSubmit(action) {
 
 function AuthCard({ title, lead, children, alt }) {
   return (
-    <div className="auth-wrap">
-      <div className="auth-box card">
-        <Link to="/" className="brand"><span className="brand-mark" />Paper Trade</Link>
-        <h1>{title}</h1>
-        <p className="muted">{lead}</p>
-        {children}
-        <p className="auth-alt">{alt}</p>
-      </div>
+    <div className="auth-split">
+      <main className="auth-side">
+        <Link to="/" className="brand"><BrandMark />Paper Trade</Link>
+        <div className="auth-box">
+          <h1>{title}</h1>
+          <p className="muted">{lead}</p>
+          {children}
+          <p className="auth-alt">{alt}</p>
+        </div>
+        <p className="auth-legal">Practice money only. No real orders are placed.</p>
+      </main>
+      <AuthPanel />
     </div>
   );
 }
@@ -57,7 +63,9 @@ export function Login() {
           <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         <ErrorText>{error}</ErrorText>
-        <button className="primary btn-block btn-lg" disabled={busy}>{busy ? "Logging in…" : "Log in"}</button>
+        <button className="primary btn-block btn-lg btn-arrow" disabled={busy} aria-busy={busy}>
+          {busy ? <><span className="spinner" />Logging in…</> : "Log in"}
+        </button>
       </form>
     </AuthCard>
   );
@@ -92,7 +100,9 @@ export function Register() {
           <input id="bal" type="number" min="1" max={MAX_START} step="1" required value={form.starting_balance} onChange={set("starting_balance")} />
         </div>
         <ErrorText>{error}</ErrorText>
-        <button className="primary btn-block btn-lg" disabled={busy}>{busy ? "Creating account…" : "Create account"}</button>
+        <button className="primary btn-block btn-lg btn-arrow" disabled={busy} aria-busy={busy}>
+          {busy ? <><span className="spinner" />Creating account…</> : "Create account"}
+        </button>
       </form>
     </AuthCard>
   );

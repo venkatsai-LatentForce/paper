@@ -24,7 +24,7 @@ export default function Holdings() {
       {loading ? <TableSkeleton /> : !data?.length ? (
         <Empty>
           <p>You don't hold anything yet.</p>
-          <Link to="/explore"><button className="primary">Explore instruments</button></Link>
+          <Link to="/explore" className="btn primary">Explore instruments</Link>
         </Empty>
       ) : (
         <div className="table-wrap">

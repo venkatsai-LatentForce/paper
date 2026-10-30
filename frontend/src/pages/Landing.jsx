@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { money, signedMoney, tone } from "../format.js";
-import { useReveal, useTickDirection } from "../hooks.js";
-
-const START_CASH = 1000000;
-const DEMO = { RELIANCE: 2950, TCS: 4100, INFY: 1850 };
+import BrandMark from "../components/BrandMark.jsx";
+import Faq from "../components/landing/Faq.jsx";
+import PracticeTicket from "../components/landing/PracticeTicket.jsx";
+import ProductPreview from "../components/landing/ProductPreview.jsx";
+import TickerTape from "../components/landing/TickerTape.jsx";
+import { useReveal, useScrolled } from "../hooks.js";
 
 const STEPS = [
   ["Set your practice balance", "Choose any amount up to ₹10,00,000. Past that, it grows only through profitable trades."],
@@ -12,142 +12,57 @@ const STEPS = [
   ["Trade, then review", "Buy and sell stocks, futures and options. Every order shows exactly what it made or lost."],
 ];
 
-const MARKETS = [
-  ["Stocks", "RELIANCE · TCS · INFY", [["Exchange", "NSE"], ["You pay", "Full price"], ["Selling", "What you hold"]]],
-  ["Futures", "NIFTY · BANKNIFTY", [["Exchange", "NFO"], ["You pay", "15% margin"], ["Quantity", "In lots"]]],
-  ["Options", "Calls and puts", [["Exchange", "NFO"], ["You pay", "The premium"], ["Quantity", "In lots"]]],
+const MARKET_COLS = [
+  ["Stocks", "RELIANCE, TCS, INFY…"],
+  ["Futures", "NIFTY, BANKNIFTY…"],
+  ["Options", "Calls and puts"],
+];
+const MARKET_ROWS = [
+  ["Exchange", "NSE", "NFO", "NFO"],
+  ["You pay", "Full price", "15% margin", "The premium"],
+  ["Quantity", "Any number of shares", "In lots", "In lots"],
+  ["Selling", "What you hold", "Close what you hold", "Close what you hold"],
 ];
 
-const REAL = [
-  ["Prices", "From your own Kite account, once connected"],
-  ["Lot sizes and expiries", "The same contracts you'd trade on NFO"],
-  ["P&L arithmetic", "Average price, margin and realised profit, worked out per order"],
+const LEDGER = [
+  ["Prices", "From your own Kite account, once connected", "The money", "Dummy INR. You can't deposit or withdraw real funds"],
+  ["Lot sizes and expiries", "The same contracts you'd trade on NFO", "The orders", "Filled instantly in the app, never sent to an exchange"],
+  ["P&L arithmetic", "Average price, margin and realised profit, per order", "The costs", "No brokerage, taxes or slippage"],
 ];
-
-const PRACTICE = [
-  ["The money", "Dummy INR. You can't deposit or withdraw real funds"],
-  ["The orders", "Filled instantly in the app, never sent to an exchange"],
-  ["The costs", "No brokerage, taxes or slippage"],
-];
-
-// A self-contained practice trade: prices drift locally, nothing touches the server.
-function PracticeTicket() {
-  const [symbol, setSymbol] = useState("RELIANCE");
-  const [prices, setPrices] = useState(DEMO);
-  const [qty, setQty] = useState(10);
-  const [position, setPosition] = useState(null);
-  const [realized, setRealized] = useState(0);
-  const [result, setResult] = useState(null);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setPrices((p) =>
-        Object.fromEntries(
-          Object.entries(p).map(([s, v]) => [s, Math.round((v + v * (Math.random() - 0.48) * 0.004) / 0.05) * 0.05])
-        )
-      );
-    }, 1400);
-    return () => clearInterval(id);
-  }, []);
-
-  const price = prices[symbol];
-  const dir = useTickDirection(price);
-  const livePnl = position ? (price - position.price) * position.qty : 0;
-  const cash = START_CASH + realized - (position ? position.price * position.qty : 0);
-
-  const buy = () => {
-    setPosition({ symbol, qty, price });
-    setResult(null);
-  };
-  const sell = () => {
-    const pnl = (price - position.price) * position.qty;
-    setRealized((r) => r + pnl);
-    setResult({ pnl, symbol, qty: position.qty });
-    setPosition(null);
-  };
-
-  return (
-    <div className="ticket" aria-label="Practice trade demo">
-      <div className="spread">
-        <span className="eyebrow">Try a practice trade</span>
-        <span className="tag">Simulated prices</span>
-      </div>
-
-      <div className="segmented" role="group" aria-label="Stock">
-        {Object.keys(DEMO).map((s) => (
-          <button key={s} type="button" className={symbol === s ? "on" : ""}
-            disabled={Boolean(position) && position.symbol !== s} onClick={() => setSymbol(s)}>
-            {s}
-          </button>
-        ))}
-      </div>
-
-      <div className={`ticket-price ${dir}`}>{money(price)}</div>
-      <div className="ticket-meta">NSE · {symbol}</div>
-
-      <div className="ticket-body">
-        {position ? (
-          <>
-            <div className="kv"><span className="muted">Bought {position.qty} at</span><span className="num">{money(position.price)}</span></div>
-            <div className="kv">
-              <span className="muted">Open P&amp;L</span>
-              <span className={`num ${tone(livePnl)}`} style={{ fontWeight: 800, fontSize: "var(--fs-lg)" }}>{signedMoney(livePnl)}</span>
-            </div>
-            <button type="button" className="sell btn-block" style={{ marginTop: "var(--s-3)" }} onClick={sell}>
-              Sell {position.qty} {symbol}
-            </button>
-          </>
-        ) : (
-          <>
-            <div className="ticket-trade">
-              <div className="stepper">
-                <button type="button" aria-label="Decrease quantity" onClick={() => setQty((q) => Math.max(5, q - 5))}>−</button>
-                <span className="num">{qty} shares</span>
-                <button type="button" aria-label="Increase quantity" onClick={() => setQty((q) => Math.min(200, q + 5))}>+</button>
-              </div>
-              <button type="button" className="buy" onClick={buy}>Buy {symbol}</button>
-            </div>
-            <div className="kv" style={{ marginTop: "var(--s-2)" }}>
-              <span className="muted">Order value</span><span className="num">{money(qty * price)}</span>
-            </div>
-          </>
-        )}
-      </div>
-
-      {result && (
-        <div key={realized} className={`ticket-result ${tone(result.pnl)}`}>
-          Sold {result.qty} {result.symbol} for{" "}
-          <strong className={tone(result.pnl)}>{signedMoney(result.pnl)}</strong>. Your account logs every trade like this.
-        </div>
-      )}
-
-      <div className="ticket-foot spread small">
-        <span className="muted">Practice cash</span>
-        <span className="num" style={{ fontWeight: 700, fontSize: "var(--fs-base)" }}>{money(cash)}</span>
-      </div>
-    </div>
-  );
-}
 
 function Reveal({ as: Tag = "div", className = "", children, ...rest }) {
   const ref = useReveal();
   return <Tag ref={ref} className={`reveal ${className}`} {...rest}>{children}</Tag>;
 }
 
-export default function Landing() {
+function SectionHead({ eyebrow, title, children }) {
   return (
-    <div>
-      <header className="landing-hero">
-        <nav className="landing-nav">
-          <span className="brand"><span className="brand-mark" />Paper Trade</span>
-          <div className="row">
+    <Reveal className="section-head">
+      <span className="eyebrow">{eyebrow}</span>
+      <h2>{title}</h2>
+      {children && <p>{children}</p>}
+    </Reveal>
+  );
+}
+
+export default function Landing() {
+  const scrolled = useScrolled(24);
+  return (
+    <div className="landing">
+      <header className={`landing-nav-wrap${scrolled ? " scrolled" : ""}`}>
+        <nav className="landing-nav" aria-label="Main">
+          <Link to="/" className="brand"><BrandMark />Paper Trade</Link>
+          <div className="landing-links">
             <a href="#how" className="hide-sm">How it works</a>
             <a href="#markets" className="hide-sm">Markets</a>
+            <a href="#faq" className="hide-sm">FAQ</a>
             <Link to="/login">Log in</Link>
-            <Link to="/register"><button className="accent">Sign up</button></Link>
+            <Link to="/register" className="btn accent btn-sm">Sign up</Link>
           </div>
         </nav>
+      </header>
 
+      <section className="landing-hero">
         <div className="hero-grid">
           <div className="hero-copy">
             <span className="eyebrow">Practice trading · NSE stocks, futures &amp; options</span>
@@ -157,20 +72,18 @@ export default function Landing() {
               and see the profit or loss on every order. Nothing here touches real money.
             </p>
             <div className="row">
-              <Link to="/register"><button className="accent btn-lg btn-arrow">Create free account</button></Link>
-              <Link to="/login"><button className="ghost btn-lg">Log in</button></Link>
+              <Link to="/register" className="btn accent btn-lg btn-arrow">Create free account</Link>
+              <Link to="/login" className="btn ghost btn-lg">Log in</Link>
             </div>
             <p className="hero-note">No card, no brokerage, no real orders.</p>
           </div>
           <PracticeTicket />
         </div>
-      </header>
+        <TickerTape />
+      </section>
 
       <section className="section" id="how">
-        <Reveal className="section-head">
-          <span className="eyebrow">How it works</span>
-          <h2>From sign-up to first trade in a minute.</h2>
-        </Reveal>
+        <SectionHead eyebrow="How it works" title="From sign-up to first trade in a minute." />
         <Reveal className="steps">
           {STEPS.map(([title, text], i) => (
             <div className="step" key={title} style={{ "--i": i }}>
@@ -182,52 +95,91 @@ export default function Landing() {
         </Reveal>
       </section>
 
+      <section className="band">
+        <div className="band-inner">
+          <SectionHead eyebrow="The app" title="One calm view of everything you hold.">
+            Portfolio value, cash, open positions and every order's P&amp;L, refreshed as prices move.
+          </SectionHead>
+          <ProductPreview />
+        </div>
+      </section>
+
       <section className="section" id="markets">
-        <Reveal className="section-head">
-          <span className="eyebrow">Markets</span>
-          <h2>Three markets, one practice account.</h2>
-          <p>Each follows its real rules, so what you learn carries over.</p>
-        </Reveal>
-        <Reveal className="markets">
-          {MARKETS.map(([title, eg, specs], i) => (
-            <div className="card market" key={title} style={{ "--i": i }}>
-              <h3>{title}</h3>
-              <div className="eg">{eg}</div>
-              {specs.map(([k, v]) => (
-                <div className="spec" key={k}><span>{k}</span><span>{v}</span></div>
+        <SectionHead eyebrow="Markets" title="Three markets, their real rules.">
+          What you learn here carries over, because each market works the way it does on the exchange.
+        </SectionHead>
+        <Reveal className="compare-wrap">
+          <table className="compare">
+            <thead>
+              <tr>
+                <th scope="col"><span className="sr-only">Rule</span></th>
+                {MARKET_COLS.map(([name, eg]) => (
+                  <th scope="col" key={name}><span className="compare-name">{name}</span><span className="compare-eg">{eg}</span></th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MARKET_ROWS.map(([rule, ...vals]) => (
+                <tr key={rule}>
+                  <th scope="row">{rule}</th>
+                  {vals.map((v, i) => <td key={i}>{v}</td>)}
+                </tr>
               ))}
-            </div>
-          ))}
+            </tbody>
+          </table>
         </Reveal>
       </section>
 
       <section className="section">
-        <Reveal className="section-head">
-          <span className="eyebrow">Know what you're practising</span>
-          <h2>What's real, and what's practice.</h2>
-        </Reveal>
-        <Reveal className="truth">
-          <div className="card truth-real" style={{ "--i": 0 }}>
-            <h3>Real</h3>
-            <ul>{REAL.map(([k, v]) => <li key={k}><strong>{k}</strong><span>{v}</span></li>)}</ul>
+        <SectionHead eyebrow="Know what you're practising" title="What's real, and what's practice." />
+        <Reveal className="ledger">
+          <div className="ledger-col">
+            <h3><span className="ledger-key ledger-key-real" />Real</h3>
+            {LEDGER.map(([k, v]) => <div className="ledger-row" key={k}><strong>{k}</strong><span>{v}</span></div>)}
           </div>
-          <div className="card truth-practice" style={{ "--i": 1 }}>
-            <h3>Practice</h3>
-            <ul>{PRACTICE.map(([k, v]) => <li key={k}><strong>{k}</strong><span>{v}</span></li>)}</ul>
+          <div className="ledger-col">
+            <h3><span className="ledger-key ledger-key-practice" />Practice</h3>
+            {LEDGER.map(([, , k, v]) => <div className="ledger-row" key={k}><strong>{k}</strong><span>{v}</span></div>)}
           </div>
         </Reveal>
+      </section>
+
+      <section className="section" id="faq">
+        <div className="faq-grid">
+          <SectionHead eyebrow="Questions" title="Before you start." />
+          <Reveal><Faq /></Reveal>
+        </div>
       </section>
 
       <Reveal as="section" className="cta-band">
         <div>
           <h2>Your first practice trade is a minute away.</h2>
-          <Link to="/register"><button className="accent btn-lg btn-arrow">Create free account</button></Link>
+          <Link to="/register" className="btn accent btn-lg btn-arrow">Create free account</Link>
         </div>
       </Reveal>
 
       <footer className="landing-foot">
-        <span className="brand"><span className="brand-mark" />Paper Trade</span>
-        <span>A learning tool. No real orders are placed, and nothing here is investment advice.</span>
+        <div className="foot-brand">
+          <span className="brand"><BrandMark />Paper Trade</span>
+          <p>Practice trading for NSE stocks, futures and options, with dummy INR and real prices.</p>
+        </div>
+        <div className="foot-cols">
+          <div>
+            <span className="eyebrow">Product</span>
+            <a href="#how">How it works</a>
+            <a href="#markets">Markets</a>
+            <a href="#faq">FAQ</a>
+          </div>
+          <div>
+            <span className="eyebrow">Account</span>
+            <Link to="/register">Create account</Link>
+            <Link to="/login">Log in</Link>
+          </div>
+        </div>
+        <p className="foot-legal">
+          A learning tool. No real orders are placed, and nothing here is investment advice.
+          Kite and Zerodha are trademarks of their owners; Paper Trade is not affiliated with them.
+        </p>
       </footer>
     </div>
   );

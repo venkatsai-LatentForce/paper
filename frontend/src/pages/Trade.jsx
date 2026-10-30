@@ -99,7 +99,7 @@ function OrderForm({ q, holding, onFilled }) {
       {blocker && qty > 0 && <p className="error">{blocker}</p>}
       <ErrorText>{error}</ErrorText>
       <button className={`btn-block ${side === "BUY" ? "buy" : "sell"}`} disabled={busy || Boolean(blocker)}>
-        {busy ? "Placing…" : `${side === "BUY" ? "Buy" : "Sell"} ${qty || ""} ${q.symbol}`}
+        {busy ? <><span className="spinner" />Placing order…</> : `${side === "BUY" ? "Buy" : "Sell"} ${qty || ""} ${q.symbol}`}
       </button>
 
       {result && (

@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { money } from "../format.js";
+import BrandMark from "./BrandMark.jsx";
 
 const LINKS = [
   ["/dashboard", "Dashboard"],
@@ -17,7 +18,7 @@ export default function Layout({ children }) {
     <>
       <header className="topbar">
         <div className="topbar-inner">
-          <NavLink to="/dashboard" className="brand"><span className="brand-mark" />Paper Trade</NavLink>
+          <NavLink to="/dashboard" className="brand"><BrandMark />Paper Trade</NavLink>
           <nav aria-label="Main">
             {LINKS.map(([to, label]) => (
               <NavLink key={to} to={to}>{label}</NavLink>
