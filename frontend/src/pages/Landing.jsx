@@ -1,15 +1,24 @@
 import { Link } from "react-router-dom";
 import BrandMark from "../components/BrandMark.jsx";
 import Faq from "../components/landing/Faq.jsx";
-import PracticeTicket from "../components/landing/PracticeTicket.jsx";
 import ProductPreview from "../components/landing/ProductPreview.jsx";
+import StrategyTester from "../components/landing/StrategyTester.jsx";
 import TickerTape from "../components/landing/TickerTape.jsx";
 import { useReveal, useScrolled } from "../hooks.js";
 
 const STEPS = [
-  ["Start with ₹1,00,000", "Every account opens with ₹1,00,000 of practice money. Add more up to ₹10,00,000; past that, only profits grow it."],
-  ["Connect Kite, or start now", "Link your own Kite Connect app for live prices. Until then, practise on simulated prices."],
-  ["Trade, then review", "Buy and sell stocks, futures and options. Every order shows exactly what it made or lost."],
+  ["Sign up", "Your practice account is ready to trade the moment it's created. No card, no KYC."],
+  ["Build the position", "Buy stocks, futures and options on their own, or as the legs of a strategy: a protective put, a hedged future, a straddle."],
+  ["Watch it at live prices", "Connect your Kite account and see how the strategy behaves as the market moves. Holdings track every leg; Orders keep the record."],
+];
+
+// Strategies the app can run today. Every leg is a buy: you can sell only what you hold.
+const STRATEGY_ROWS = [
+  ["Protective put", "Stock + bought put", "You like a stock but fear a fall", "Capped at the put's strike"],
+  ["Hedged futures", "Long future + bought put", "You're bullish on the index and want leverage", "Capped at the put's strike"],
+  ["Long straddle", "Bought call + bought put, same strike", "You expect a big move, either way", "Only what you paid"],
+  ["Long strangle", "Bought call + bought put, different strikes", "A bigger move, for a cheaper entry", "Only what you paid"],
+  ["Index hedge", "Stock basket + bought NIFTY put", "You want to protect a whole portfolio", "Reduced, depending on cover"],
 ];
 
 const MARKET_COLS = [
@@ -25,7 +34,7 @@ const MARKET_ROWS = [
 ];
 
 const LEDGER = [
-  ["Prices", "From your own Kite account, once connected", "The money", "Dummy INR. You can't deposit or withdraw real funds"],
+  ["Prices", "From your own Kite account, once connected", "The balance", "Practice only. You can't deposit or withdraw real funds"],
   ["Lot sizes and expiries", "The same contracts you'd trade on NFO", "The orders", "Filled instantly in the app, never sent to an exchange"],
   ["P&L arithmetic", "Average price, margin and realised profit, per order", "The costs", "No brokerage, taxes or slippage"],
 ];
@@ -54,8 +63,8 @@ export default function Landing() {
         <nav className="landing-nav" aria-label="Main">
           <Link to="/" className="brand"><BrandMark />Paper Trade</Link>
           <div className="landing-links">
+            <a href="#strategies" className="hide-sm">Strategies</a>
             <a href="#how" className="hide-sm">How it works</a>
-            <a href="#markets" className="hide-sm">Markets</a>
             <a href="#faq" className="hide-sm">FAQ</a>
             <Link to="/login">Log in</Link>
             <Link to="/register" className="btn primary btn-sm">Sign up</Link>
@@ -67,27 +76,54 @@ export default function Landing() {
         <section className="landing-hero" id="hero">
           <div className="hero-grid">
             <div className="hero-copy">
-              <span className="label">Practice trading · NSE stocks, futures &amp; options</span>
-              <h1 className="hero-title">Make your mistakes with <em>practice money.</em><span className="cursor" aria-hidden="true" /></h1>
+              <span className="label">Strategy practice · NSE stocks, futures &amp; options</span>
+              <h1 className="hero-title">Test the strategy <em>before you trade it.</em><span className="cursor" aria-hidden="true" /></h1>
               <p className="hero-lead">
-                Start with ₹1,00,000 in dummy INR and add more up to ₹10,00,000. Trade at live prices from
-                your own Kite account and see the profit or loss on every order. Nothing here touches real money.
+                Build a position, hedge it with futures and options, and watch how it behaves at live market
+                prices. Practise as often as you like. Nothing here touches a real account.
               </p>
               <div className="row">
-                <Link to="/register" className="btn primary btn-lg btn-arrow">Create free account</Link>
-                <Link to="/login" className="btn btn-lg">Log in</Link>
+                <Link to="/register" className="btn primary btn-lg btn-arrow">Start practising</Link>
+                <a href="#strategies" className="btn btn-lg">See strategies</a>
               </div>
-              <ul className="hero-facts" aria-label="What it costs">
-                <li>No card</li><li>No brokerage</li><li>No real orders</li>
+              <ul className="hero-facts" aria-label="What it involves">
+                <li>Live prices</li><li>Real contract rules</li><li>No real orders</li>
               </ul>
             </div>
-            <PracticeTicket />
+            <StrategyTester />
           </div>
           <TickerTape />
         </section>
 
+        <section className="section" id="strategies">
+          <SectionHead eyebrow="Strategies" title="Hedges you can test today.">
+            Every strategy here is built from legs you can place in the app, so you can practise it end to end.
+          </SectionHead>
+          <Reveal className="compare-wrap">
+            <table className="compare compare-strategies">
+              <thead>
+                <tr>
+                  <th scope="col">Strategy</th><th scope="col">Built from</th>
+                  <th scope="col">Use it when</th><th scope="col">Worst case</th>
+                </tr>
+              </thead>
+              <tbody>
+                {STRATEGY_ROWS.map(([name, legs, when, worst]) => (
+                  <tr key={name}>
+                    <th scope="row"><span className="compare-name">{name}</span></th>
+                    <td>{legs}</td><td>{when}</td><td>{worst}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="compare-note">
+              Strategies that sell options you don't hold, like covered calls, spreads and iron condors, aren't supported yet.
+            </p>
+          </Reveal>
+        </section>
+
         <section className="section" id="how">
-          <SectionHead eyebrow="How it works" title="From sign-up to first trade in a minute." />
+          <SectionHead eyebrow="How it works" title="From idea to tested strategy." />
           <Reveal as="ol" className="steps">
             {STEPS.map(([title, text], i) => (
               <li className="step" key={title} style={{ "--i": i }}>
@@ -100,8 +136,8 @@ export default function Landing() {
         </section>
 
         <section className="section section-wide">
-          <SectionHead eyebrow="The app" title="One calm view of everything you hold.">
-            Portfolio value, cash, open positions and every order's P&amp;L, refreshed as prices move.
+          <SectionHead eyebrow="In practice" title="See a hedge do its job.">
+            A sample portfolio on a falling day: the stocks drop, the NIFTY put rises, and the net move stays small.
           </SectionHead>
           <ProductPreview />
         </section>
@@ -153,8 +189,8 @@ export default function Landing() {
 
         <Reveal as="section" className="cta-band">
           <div className="cta-inner">
-            <h2><span className="prompt" aria-hidden="true">›</span>Your first practice trade is a minute away.</h2>
-            <Link to="/register" className="btn primary btn-lg btn-arrow">Create free account</Link>
+            <h2><span className="prompt" aria-hidden="true">›</span>Your next strategy deserves a test run.</h2>
+            <Link to="/register" className="btn primary btn-lg btn-arrow">Start practising</Link>
           </div>
         </Reveal>
       </main>
@@ -162,11 +198,12 @@ export default function Landing() {
       <footer className="landing-foot">
         <div className="foot-brand">
           <span className="brand"><BrandMark />Paper Trade</span>
-          <p>Practice trading for NSE stocks, futures and options, with dummy INR and real prices.</p>
+          <p>Test trading strategies on NSE stocks, futures and options at live prices, without a real account.</p>
         </div>
         <div className="foot-cols">
           <div>
             <span className="label">Product</span>
+            <a href="#strategies">Strategies</a>
             <a href="#how">How it works</a>
             <a href="#markets">Markets</a>
             <a href="#faq">FAQ</a>

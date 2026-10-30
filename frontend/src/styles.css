@@ -122,12 +122,19 @@ button, .btn {
   font: inherit; font-size: var(--fs-sm); font-weight: 600; line-height: 1; white-space: nowrap; text-decoration: none;
   border: 1px solid var(--rule); background: transparent; color: var(--text);
   box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.22);
+  /* Box-shadow eases out slowly so the press ring lingers as an after-glow. */
   transition: background-color var(--fast) var(--ease), border-color var(--fast) var(--ease), color var(--fast) var(--ease),
-    transform 80ms var(--ease), box-shadow 80ms var(--ease);
+    background-size var(--med) var(--ease), transform 80ms var(--ease), box-shadow 480ms var(--ease);
+  /* Outline buttons: a tan underline draws in from the left on hover. */
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat; background-position: 0 100%; background-size: 0 2px;
 }
 .btn:hover { text-decoration: none; }
-button:hover:not(:disabled), .btn:hover { background: var(--chocolate); border-color: var(--tan); }
-button:active:not(:disabled), .btn:active { transform: translateY(1px); box-shadow: inset 0 0 0 transparent; }
+button:hover:not(:disabled), .btn:hover { background-color: var(--chocolate); background-size: 100% 2px; border-color: var(--tan); }
+button:active:not(:disabled), .btn:active {
+  transform: translateY(1px); box-shadow: inset 0 0 0 transparent, 0 0 0 4px rgba(168, 132, 98, 0.32);
+  transition: transform 60ms var(--ease), box-shadow 60ms var(--ease);
+}
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -2px 0 rgba(26, 18, 14, 0.3); }
@@ -143,9 +150,41 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-sm { height: 32px; padding: 0 var(--s-3); font-size: var(--fs-xs); }
 .btn-lg { height: 48px; padding: 0 var(--s-5); font-size: var(--fs-base); }
 .btn-arrow::after { content: "→"; display: inline-block; transition: transform var(--med) var(--ease); }
-.btn-arrow:hover::after { transform: translateX(3px); }
+/* The arrow runs out to the right and comes back in from the left. */
+.btn-arrow:hover::after { animation: arrow-loop 560ms var(--ease) both; }
 .btn-arrow[aria-busy="true"]::after { display: none; }
 .spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.7s linear infinite; }
+
+/* Brand buttons: a narrow band of light sweeps across on hover, like the terminal's scan line. */
+.primary, .buy, .sell { overflow: hidden; isolation: isolate; }
+.primary::before, .buy::before, .sell::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: translateX(-110%);
+}
+.primary:hover:not(:disabled)::before, .primary.btn:hover::before, .buy:hover:not(:disabled)::before, .sell:hover:not(:disabled)::before {
+  transform: translateX(110%); transition: transform 640ms var(--ease);
+}
+/* Busy: a short bar runs along the bottom edge (replaces the sweep). */
+button[aria-busy="true"] { overflow: hidden; }
+button[aria-busy="true"]::before {
+  content: ""; position: absolute; inset: auto auto 0 0; z-index: 1; width: 35%; height: 2px;
+  background: currentColor; opacity: 0.6; transform: none; animation: busy-bar 1s var(--ease) infinite;
+}
+/* Filled: the order button pops once and shows a drawn tick. */
+.btn-done { animation: done-pop 460ms var(--ease); }
+.tick { width: 12px; height: 7px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg) translateY(-2px); animation: tick-draw 320ms var(--ease) 80ms both; }
+
+/* Sliding tabs: one indicator glides between equal-width options (--n options, --idx active). */
+.seg-slide { position: relative; gap: 0; }
+.seg-slide::after {
+  content: ""; position: absolute; top: 2px; bottom: 2px; z-index: 0;
+  left: calc(2px + (100% - 4px) / var(--n) * var(--idx)); width: calc((100% - 4px) / var(--n));
+  background: var(--chocolate); border-radius: var(--radius-sm); box-shadow: inset 0 -2px 0 var(--accent);
+  transition: left 280ms var(--ease);
+}
+.seg-slide button { position: relative; z-index: 1; flex: 1; }
+.seg-slide button.on, .seg-slide button.on:hover:not(:disabled), .seg-slide button:hover:not(:disabled) { background: transparent; box-shadow: none; }
 
 .segmented { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--well); }
 .segmented button {
@@ -471,6 +510,36 @@ table.compact th:first-child, table.compact td:first-child { padding-left: var(-
 .ticket-foot .num { font-size: var(--fs-md); font-weight: 700; }
 @media (max-width: 420px) { .ticket-trade { grid-template-columns: 1fr; } .ticket-price { font-size: var(--fs-xl); } }
 
+/* Strategy tester: the hero's working demo. A payoff-at-expiry chart with a live price marker. */
+.tester .ticket-symbols button { font-size: var(--fs-xs); white-space: nowrap; padding: 0 var(--s-1); }
+@media (max-width: 420px) { .tester .ticket-symbols button { font-size: var(--fs-2xs); letter-spacing: 0; } }
+.tester-idea { padding: var(--s-3) var(--s-4) 0; font-size: var(--fs-sm); color: var(--muted); min-height: calc(3 * 1.5em + var(--s-3)); animation: rise var(--med) var(--ease) both; }
+.tester-chart { margin: var(--s-3) var(--s-4) 0; padding: var(--s-3); background: var(--well); border: 1px solid var(--rule-soft); border-radius: var(--radius-sm); }
+.tester-chart-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-2); }
+.chip-state { display: inline-flex; align-items: center; gap: 6px; padding: 2px var(--s-2); border-radius: 3px; font-size: var(--fs-xs); font-weight: 600; background: var(--up-wash); color: var(--up); transition: background-color var(--med) var(--ease), color var(--med) var(--ease); }
+.chip-state.down { background: var(--down-wash); color: var(--down); }
+.chip-state b { color: var(--text); font-weight: 700; }
+.payoff { display: block; width: 100%; height: auto; overflow: visible; }
+.payoff-gain { fill: var(--up-wash); }
+.payoff-loss { fill: var(--down-wash); }
+.payoff-zero { stroke: var(--graphite); stroke-width: 1; }
+.payoff-be { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.7; }
+.payoff-curve { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-dasharray: 1; animation: payoff-draw 700ms var(--ease) both; }
+.payoff-zone { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.payoff-zone.up { fill: var(--up); }
+.payoff-zone.down { fill: var(--down); }
+.payoff-axis { font-size: 9px; font-weight: 600; fill: var(--muted); font-stretch: var(--narrow); font-variant-numeric: tabular-nums; }
+.payoff-now line { stroke: var(--sand); stroke-width: 1; stroke-dasharray: 1 2; opacity: 0.6; }
+.payoff-now, .payoff-dot { transition: transform 900ms var(--ease); }
+.payoff-dot { stroke: var(--well); stroke-width: 2; }
+.payoff-dot.up { fill: var(--up); }
+.payoff-dot.down { fill: var(--down); }
+.legs { list-style: none; margin: var(--s-3) 0 0; padding: var(--s-3) 0 0; border-top: 1px solid var(--rule-soft); display: grid; gap: var(--s-1); }
+.legs li { display: grid; grid-template-columns: 36px auto 1fr; gap: var(--s-2); align-items: baseline; font-size: var(--fs-sm); }
+.legs .muted { font-size: var(--fs-xs); text-align: right; }
+.tester .kv dd { max-width: 60%; }
+.tester .ticket-foot { align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+
 /* Ticker tape: a status line under the hero */
 .tape { position: relative; z-index: 1; display: flex; align-items: center; height: 40px; margin: 0 calc(-1 * var(--s-5)); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--roast); }
 .tape-label { flex: none; align-self: stretch; display: flex; align-items: center; padding: 0 var(--s-4); font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-accent); background: var(--accent); }
@@ -531,6 +600,8 @@ table.compact th:first-child, table.compact td:first-child { padding-left: var(-
 .pv-row + .pv-row { border-top: 1px solid var(--rule-soft); }
 .pv-row .num { font-size: var(--fs-base); }
 .pv-row > .num:last-child { font-weight: 700; }
+.pv-hedge { background: linear-gradient(90deg, var(--up-wash), transparent 70%); box-shadow: inset 2px 0 0 var(--up); }
+.tag-hedge { border-color: var(--up); color: var(--up); }
 .pv-head { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-bottom: var(--s-2); }
 @media (max-width: 700px) {
   .pv-summary { grid-template-columns: 1fr; }
@@ -552,6 +623,16 @@ table.compact th:first-child, table.compact td:first-child { padding-left: var(-
 .compare tbody th { width: 22%; font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-left: var(--s-2); }
 .compare tbody td { font-weight: 600; }
 .compare tbody tr:last-child th { border-bottom: none; }
+/* Strategies table: names lead each row; headers read as labels. */
+.compare-strategies { min-width: 720px; }
+.compare-strategies thead th { font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-top: var(--s-3); padding-bottom: var(--s-3); }
+.compare-strategies tbody th { width: 20%; text-transform: none; letter-spacing: 0; color: var(--text); padding-left: 0; }
+.compare-strategies .compare-name { font-size: var(--fs-md); }
+.compare-strategies tbody td { font-weight: 400; color: var(--muted); }
+.compare-strategies tbody td:last-child { color: var(--text); font-weight: 600; }
+.compare-strategies tbody tr { transition: background-color var(--fast) var(--ease); }
+.compare-strategies tbody tr:hover { background: var(--roast); }
+.compare-note { margin-top: var(--s-3); font-size: var(--fs-xs); color: var(--muted); }
 
 /* Real vs practice: a two-column ledger split by one rule. */
 .ledger { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); }
@@ -612,6 +693,11 @@ table.compact th:first-child, table.compact td:first-child { padding-left: var(-
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes draw { from { stroke-dashoffset: 48; } to { stroke-dashoffset: 0; } }
+@keyframes arrow-loop { 0% { transform: none; opacity: 1; } 45% { transform: translateX(10px); opacity: 0; } 46% { transform: translateX(-10px); opacity: 0; } 100% { transform: translateX(3px); opacity: 1; } }
+@keyframes busy-bar { from { left: -35%; } to { left: 100%; } }
+@keyframes done-pop { 0% { transform: scale(0.97); filter: brightness(1.25); } 55% { transform: scale(1.02); } 100% { transform: none; filter: none; } }
+@keyframes tick-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes payoff-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

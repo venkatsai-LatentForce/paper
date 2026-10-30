@@ -81,8 +81,13 @@ A standalone line-drawn growth arrow, no tile (`components/BrandMark.jsx`, `publ
 `<button>` and `.btn` share one system. Keycap model: a 2px inner base shadow.
 
 - Variants: `.primary` (tan), `.buy` (sage), `.sell` (brick), default (graphite outline), `.btn-quiet`.
-- Hover (120ms): fill steps one shade; outlined buttons take a chocolate fill and tan border. `.btn-arrow` nudges 3px.
-- Press (80ms): drops 1px and the base flattens. Busy: `.spinner` + `aria-busy`. Focus: 2px tan ring.
+- Hover (120ms): fill steps one shade. Outlined buttons take a chocolate fill and a tan underline draws in from
+  the left. Brand buttons (`.primary`, `.buy`, `.sell`) get a light band that sweeps across, like the scan line.
+- `.btn-arrow`: the arrow runs out right and comes back in from the left.
+- Press (60ms): drops 1px, the base flattens, and a tan ring appears that fades out slowly (after-glow).
+- Busy: `.spinner` + `aria-busy`, and a short bar runs along the bottom edge. Focus: 2px tan ring.
+- Filled: after an order succeeds, the order button pops once and reads "Order filled" with a drawn tick (`.btn-done`).
+- Tabs: `.seg-slide` glides one indicator between equal-width options (set `--n` and `--idx`).
 
 ## Motion
 
@@ -92,17 +97,22 @@ Fast and precise, 80–280ms on `--ease`. Everything is disabled under `prefers-
 - **Rows**: hover lights the row and draws a 2px tan edge.
 - **Page load**: app pages settle in (4px, 200ms); a tan segment sweeps the page-head rule once.
 - **Landing**: hero lines rise in 60ms steps, a block cursor blinks after the headline, and a scan line passes
-  over the practice ticket once. The product preview gets the same scan when it scrolls into view.
+  over the strategy tester once. Its payoff curve draws in on each tab change and the "now" marker glides with
+  the price. The product preview gets the scan when it scrolls into view.
 - **Scroll**: sections reveal once, 8px, staggered 70ms (`.reveal` + `useReveal`).
 - **Auth**: new fills print to the order log with a brief chocolate highlight.
 
 ## Pages
 
-- **Landing**: hero thesis is the working practice ticket (simulated prices, buy, watch entry line and live P&L,
-  sell). Under it a ticker tape labelled "Sample". Then the three-step sequence, product preview, markets table,
-  real-vs-practice ledger, FAQ, a ruled command-line CTA and footer.
+- **Landing**: the message is *testing strategies and practising*. No rupee amounts and no word "dummy" anywhere
+  on the page. Hero thesis is the **strategy tester** (`components/landing/StrategyTester.jsx`): protective put,
+  hedged futures and long straddle, each with its legs and a payoff-at-expiry chart. It shows profit/loss zones,
+  breakeven prices and a live "now" marker, and describes risk qualitatively ("capped by the put"), not in ₹.
+  Under it a ticker tape labelled "Sample". Then: a strategies table, the three-step sequence, a sample hedged
+  portfolio in percentages, markets table, real-vs-practice ledger, FAQ, a ruled command-line CTA and footer.
+  Only strategies built from bought legs are shown, because the app can't short or write options.
 - **Auth**: split screen. Form on espresso; roast panel with a live NIFTY pane and an order log (decorative,
-  `aria-hidden`, hidden below 900px). Sign-up states the fixed ₹1,00,000 start and the ₹10,00,000 deposit cap.
+  `aria-hidden`, hidden below 900px). Sign-up asks for no amount and shows no figures.
 - **Dashboard**: summary strip, then top holdings and "Add practice funds" with a deposit-cap meter.
 - **Trade**: quote header with a large ticking price; details and position panes; sticky order ticket.
 

@@ -92,8 +92,7 @@ export function Register() {
           <input id="password" type="password" autoComplete="new-password" minLength={8} required value={form.password} onChange={set("password")} />
         </div>
         <p className="start-note">
-          You'll start with <span className="num">₹1,00,000</span> in practice money. Add more any time,
-          up to <span className="num">₹10,00,000</span>.
+          Your practice account is ready to trade as soon as you sign up. Top it up from the dashboard any time.
         </p>
         <ErrorText>{error}</ErrorText>
         <button className="primary btn-block btn-lg btn-arrow" disabled={busy} aria-busy={busy}>

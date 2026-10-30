@@ -33,6 +33,7 @@ function OrderForm({ q, holding, onFilled }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [filled, setFilled] = useState(false);
 
   const isFno = q.lot_size > 1;
   const qty = (parseInt(units, 10) || 0) * q.lot_size;
@@ -59,6 +60,9 @@ function OrderForm({ q, holding, onFilled }) {
         body: { symbol: q.symbol, exchange: q.exchange, side, quantity: qty },
       });
       setResult(order);
+      // Brief "filled" confirmation on the button itself.
+      setFilled(true);
+      setTimeout(() => setFilled(false), 1400);
       await refresh();
       onFilled();
     } catch (err) {
@@ -103,11 +107,14 @@ function OrderForm({ q, holding, onFilled }) {
         )}
       </dl>
 
-      <p className="muted small ticket-note">Executes instantly at the live price. Dummy money only.</p>
+      <p className="muted small ticket-note">Executes instantly at the live price. Practice order only.</p>
       {blocker && qty > 0 && <p className="error">{blocker}</p>}
       <ErrorText>{error}</ErrorText>
-      <button className={`btn-block btn-lg ${side === "BUY" ? "buy" : "sell"}`} disabled={busy || Boolean(blocker)} aria-busy={busy}>
-        {busy ? <><span className="spinner" />Placing order…</> : `${side === "BUY" ? "Buy" : "Sell"} ${qty || ""} ${q.symbol}`}
+      <button className={`btn-block btn-lg ${side === "BUY" ? "buy" : "sell"}${filled ? " btn-done" : ""}`}
+        disabled={busy || Boolean(blocker)} aria-busy={busy}>
+        {busy ? <><span className="spinner" />Placing order…</>
+          : filled ? <><span className="tick" aria-hidden="true" />Order filled</>
+          : `${side === "BUY" ? "Buy" : "Sell"} ${qty || ""} ${q.symbol}`}
       </button>
 
       {result && (
