@@ -50,4 +50,5 @@ if STATIC_DIR.is_dir():
         file = (STATIC_DIR / path).resolve()
         if path and file.is_file() and file.is_relative_to(STATIC_DIR):
             return FileResponse(file)
-        return FileResponse(STATIC_DIR / "index.html")
+        # Always revalidate the shell so a new build's hashed assets are picked up.
+        return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-cache"})

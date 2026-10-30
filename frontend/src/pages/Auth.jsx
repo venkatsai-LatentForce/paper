@@ -32,6 +32,7 @@ export function Login() {
 
   return (
     <div className="auth-box card">
+      <Link to="/" className="brand"><span className="brand-mark" />Paper Trade</Link>
       <h1>Log in</h1>
       <p className="muted small">Welcome back to Paper Trade.</p>
       <form onSubmit={submit}>
@@ -63,6 +64,7 @@ export function Register() {
 
   return (
     <div className="auth-box card">
+      <Link to="/" className="brand"><span className="brand-mark" />Paper Trade</Link>
       <h1>Create account</h1>
       <p className="muted small">Practice money only — no real funds, ever.</p>
       <form onSubmit={submit}>

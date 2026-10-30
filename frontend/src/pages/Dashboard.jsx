@@ -67,7 +67,7 @@ export default function Dashboard() {
       {d && (
         <>
           <div className="grid">
-            <Stat label="Portfolio value">{money(d.portfolio_value)}</Stat>
+            <Stat label="Portfolio value" hero>{money(d.portfolio_value)}</Stat>
             <Stat label="Available cash">{money(d.cash)}</Stat>
             <Stat label="Invested" hint={`Current value ${money(d.holdings_value)}`}>{money(d.invested)}</Stat>
             <Stat label="Total P&L" hint={`vs ${money(d.total_deposited)} deposited`}>

@@ -16,14 +16,14 @@ export default function Layout({ children }) {
     <>
       <header className="topbar">
         <div className="topbar-inner">
-          <NavLink to="/dashboard" className="brand">Paper Trade</NavLink>
+          <NavLink to="/dashboard" className="brand"><span className="brand-mark" />Paper Trade</NavLink>
           <nav>
             {LINKS.map(([to, label]) => (
               <NavLink key={to} to={to}>{label}</NavLink>
             ))}
           </nav>
           <div className="topbar-right">
-            <span className="muted small" title="Available cash">{money(user.cash)}</span>
+            <span className="cash-pill" title="Available cash">{money(user.cash)}</span>
             <button className="link" onClick={logout}>Log out</button>
           </div>
         </div>

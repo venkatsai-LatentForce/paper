@@ -9,9 +9,9 @@ export function Pnl({ value, percent }) {
   );
 }
 
-export function Stat({ label, children, hint }) {
+export function Stat({ label, children, hint, hero }) {
   return (
-    <div className="card stat">
+    <div className={`card stat${hero ? " stat-hero" : ""}`}>
       <div className="muted small">{label}</div>
       <div className="stat-value">{children}</div>
       {hint && <div className="muted small">{hint}</div>}
@@ -26,7 +26,8 @@ export function TypeTag({ type }) {
 export function SourceBadge({ source }) {
   if (!source) return null;
   return (
-    <span className="tag" title={source === "kite" ? "Live prices from Kite" : "Simulated prices"}>
+    <span className={`tag${source === "kite" ? " tag-live" : ""}`}
+      title={source === "kite" ? "Live prices from Kite" : "Simulated prices"}>
       {source === "kite" ? "Live · Kite" : "Simulated prices"}
     </span>
   );

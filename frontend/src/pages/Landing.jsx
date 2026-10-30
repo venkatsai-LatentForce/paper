@@ -9,18 +9,25 @@ const FEATURES = [
 export default function Landing() {
   return (
     <div className="landing">
-      <h1>Learn to trade without risking a rupee.</h1>
-      <p className="lead">
-        Paper Trade gives you a practice account with dummy money and live market prices.
-        Build habits, test ideas, and track your results — no real funds involved.
-      </p>
-      <div className="row">
-        <Link to="/register"><button className="primary">Create free account</button></Link>
-        <Link to="/login"><button>Log in</button></Link>
+      <div className="landing-nav">
+        <span className="brand"><span className="brand-mark" />Paper Trade</span>
+        <Link to="/login">Log in</Link>
       </div>
+      <section className="hero">
+        <h1>Learn to trade <mark>without risking</mark> a rupee.</h1>
+        <p className="lead">
+          A practice account with dummy money and live market prices. Build habits, test ideas,
+          and track your results. No real funds involved.
+        </p>
+        <div className="row">
+          <Link to="/register"><button className="accent">Create free account</button></Link>
+          <Link to="/login"><button>Log in</button></Link>
+        </div>
+      </section>
       <div className="features">
         {FEATURES.map(([title, text]) => (
           <div key={title} className="card">
+            <div className="feature-dot" />
             <h2>{title}</h2>
             <p className="muted small">{text}</p>
           </div>
